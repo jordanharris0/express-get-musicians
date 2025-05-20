@@ -25,4 +25,36 @@ describe("./bands endpoint", () => {
     const response = await request(app).get("/bands");
     expect(response.statusCode).toBe(200);
   });
+
+  test("GET /musicians/:id", async () => {
+    const response = await request(app).get("/musicians/1");
+    const responseData = JSON.parse(response.text);
+    expect(response.statusCode).toBe(200);
+    expect(responseData.name).toBe("Mick Jagger");
+  });
+
+  test("POST /musicians", async () => {
+    const response = await request(app)
+      .post("/musicians")
+      .send({ name: "Billy Joel", instrument: "Guitar" });
+    const responseData = JSON.parse(response.text);
+    expect(response.statusCode).toBe(200);
+    expect(responseData.name).toBe("Billy Joel");
+  });
+
+  test("PUT /musicians/:id", async () => {
+    const response = await request(app).put("/musicians/1").send({
+      name: "Black Eyed Pees",
+      instrument: "Vocals",
+    });
+    const responseData = JSON.parse(response.text);
+    expect(response.statusCode).toBe(200);
+    expect(responseData.name).toBe("Black Eyed Pees");
+  });
+
+  test("DELETE /musicians/:id", async () => {
+    const response = await request(app).delete("/musicians/1");
+    expect(response.statusCode).toBe(200);
+    expect(response.text).toBe('{"message":"Musician deleted"}');
+  });
 });

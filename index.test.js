@@ -29,6 +29,8 @@ afterAll(async () => {
 
 describe("./musicians endpoint", () => {
   // Write your tests here
+
+  // Test the GET /musicians endpoint
   test("GET /musicians", async () => {
     const response = await request(app).get("/musicians");
     const responseData = JSON.parse(response.text);
@@ -37,6 +39,7 @@ describe("./musicians endpoint", () => {
     expect(responseData[0].name).toBe("Mick Jagger");
   });
 
+  // Test the GET /musicians/:id endpoint
   test("GET /musicians/:id", async () => {
     const response = await request(app).get("/musicians/1");
     const responseData = JSON.parse(response.text);
@@ -44,6 +47,28 @@ describe("./musicians endpoint", () => {
     expect(responseData.name).toBe("Mick Jagger");
   });
 
+  // Test the POST /musicians endpoint with server side validation
+  test("POST /musicians server side validation", async () => {
+    const response = await request(app).post("/musicians").send({
+      name: "",
+      instrument: "",
+    });
+
+    const responseData = JSON.parse(response.text);
+    expect(response.statusCode).toBe(400);
+
+    expect(responseData.errors[0].path).toBe("name");
+    expect(responseData.errors[1].msg).toBe(
+      "Name must be between 2 and 20 characters"
+    );
+
+    expect(responseData.errors[2].path).toBe("instrument");
+    expect(responseData.errors[3].msg).toBe(
+      "Instrument must be between 2 and 20 characters"
+    );
+  });
+
+  // Test the POST /musicians endpoint
   test("POST /musicians", async () => {
     const response = await request(app)
       .post("/musicians")
@@ -53,6 +78,28 @@ describe("./musicians endpoint", () => {
     expect(responseData.name).toBe("Billy Joel");
   });
 
+  // Test the PUT /musicians/:id endpoint with server side validation
+  test("PUT /musicians/:id server side validation", async () => {
+    const response = await request(app).put("/musicians/1").send({
+      name: "",
+      instrument: "",
+    });
+
+    const responseData = JSON.parse(response.text);
+    expect(response.statusCode).toBe(400);
+
+    expect(responseData.errors[0].path).toBe("name");
+    expect(responseData.errors[1].msg).toBe(
+      "Name must be between 2 and 20 characters"
+    );
+
+    expect(responseData.errors[2].path).toBe("instrument");
+    expect(responseData.errors[3].msg).toBe(
+      "Instrument must be between 2 and 20 characters"
+    );
+  });
+
+  // Test the PUT /musicians/:id endpoint
   test("PUT /musicians/:id", async () => {
     const response = await request(app).put("/musicians/1").send({
       name: "Black Eyed Pees",
@@ -70,13 +117,17 @@ describe("./musicians endpoint", () => {
   });
 });
 
+// Test the /bands endpoint
 describe("./bands endpoint", () => {
   // Write your tests here
+
+  // Test the GET /bands endpoint
   test("GET /bands", async () => {
     const response = await request(app).get("/bands");
     expect(response.statusCode).toBe(200);
   });
 
+  // Test the GET /bands adn their musicians endpoint
   test("GET /bands and their musicians", async () => {
     //get all musicians
     const [mick, keith, charlie, drake, metro, laroi] =
@@ -93,8 +144,6 @@ describe("./bands endpoint", () => {
     await band3.addMusicians([metro.id, laroi.id]);
 
     const response = await request(app).get("/bands");
-
-    console.log(JSON.stringify(response.body, null, 2));
 
     expect(response.statusCode).toBe(200);
     expect(response.body[0].musicians.length).toBe(2);

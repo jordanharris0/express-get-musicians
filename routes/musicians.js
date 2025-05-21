@@ -1,7 +1,6 @@
 const express = require("express");
-
 const musicians = express.Router();
-const { Musician, Band } = require("../models");
+const { Musician } = require("../models");
 
 musicians.use(express.json());
 musicians.use(express.urlencoded({ extended: true }));
@@ -9,11 +8,6 @@ musicians.use(express.urlencoded({ extended: true }));
 musicians.get("/", async (req, res) => {
   const musicians = await Musician.findAll();
   res.json(musicians);
-});
-
-musicians.get("/bands", async (req, res) => {
-  const bands = await Band.findAll();
-  res.json(bands);
 });
 
 musicians.get("/:id", async (req, res) => {

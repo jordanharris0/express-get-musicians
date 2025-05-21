@@ -1,13 +1,29 @@
-// install dependencies
-const { execSync } = require("child_process");
-execSync("npm install");
-execSync("npm run seed");
-
 const request = require("supertest");
 const { db } = require("./db/connection");
 const { Musician, Band } = require("./models/index");
 const app = require("./src/app");
-const { seedMusician } = require("./seedData");
+
+beforeAll(async () => {
+  await db.sync({ force: true });
+
+  //create data
+  await Musician.bulkCreate([
+    { name: "Mick Jagger", instrument: "Vocals" },
+    { name: "Keith Richards", instrument: "Guitar" },
+    { name: "Charlie Watts", instrument: "Drums" },
+  ]);
+
+  await Band.bulkCreate([
+    { name: "The Rolling Stones", genre: "Rock" },
+    { name: "The Beatles", genre: "Rock" },
+    { name: "Led Zeppelin", genre: "Rock" },
+  ]);
+}, 15000);
+
+afterAll(async () => {
+  await db.close();
+});
+
 describe("./musicians endpoint", () => {
   // Write your tests here
   test("GET /musicians", async () => {
@@ -21,8 +37,8 @@ describe("./musicians endpoint", () => {
 
 describe("./bands endpoint", () => {
   // Write your tests here
-  test("GET /bands", async () => {
-    const response = await request(app).get("/bands");
+  test("GET /musicians/bands", async () => {
+    const response = await request(app).get("/musicians/bands");
     expect(response.statusCode).toBe(200);
   });
 
